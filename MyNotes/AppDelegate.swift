@@ -17,6 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //Passes NSManagedObjectContext down to My Notes Table View Controller
+        //We're letting the context get passed around to different parts of the app
+        if let nav = window?.rootViewController as? UINavigationController {
+            if let top = nav.topViewController {
+                if top.respondsToSelector("setManagedObjectContext:") {
+                    top.performSelector("setManagedObjectContext:", withObject:
+                    managedObjectContext)
+                }
+            }
+        }
         return true
     }
 
@@ -65,7 +76,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("SingleViewCoreData.sqlite")
         var failureReason = "There was an error creating or loading the application's saved data."
         do {
-            try coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil)
+            //Instead of the default 'nil' in the options section, we've enabled 2 options
+            //The options we've allowed lets the program do light-weight core data migrations
+            try coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
         } catch {
             // Report any error we got.
             var dict = [String: AnyObject]()

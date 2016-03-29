@@ -6,6 +6,8 @@
 //  Copyright © 2016 student. All rights reserved.
 //
 
+//This file is no longer really necessary but I kept it just in case
+
 import UIKit
 
 class ViewController: UIViewController {
