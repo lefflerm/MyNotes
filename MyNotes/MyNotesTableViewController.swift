@@ -26,7 +26,11 @@ class MyNotesTableViewController: UITableViewController {
         
         //time to call the helper :D gotta make sure the data is FRESH
         reloadData()
-        //I'm leaving this code at the bottom so it always reloads last when necessary
+        
+        title = "Current Notes: " + String(notes.count)
+        //This line is wrong somehow because the current notes never actually updates, apparently. So there's probably another way to do it, I just missed it. 
+        
+        
 
     }
     
@@ -128,25 +132,35 @@ class MyNotesTableViewController: UITableViewController {
     }
 
 
-    /*
+    //These two methods allow for deleting. The first we just had to uncomment so it can return true and let us edit
+    
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-    */
+   
 
-    /*
+  
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            //emptied the text out of this method and added our own code :D
+            let note = notes[indexPath.row] //this is the note we are currently swiping left on to delete
+            managedObjectContext.deleteObject(note) //deleting said note
+            
+            //saving the managed object context, like ya do
+            do{
+                try self.managedObjectContext.save()
+            } catch {
+                print("Error saving managed object context!")
+            }
+            
+            //reloading data so you can tell that your delete went through
+            reloadData()
+        } //got rid of the else if cause it wasn't necessary
     }
-    */
+    
 
     /*
     // Override to support rearranging the table view.
