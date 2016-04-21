@@ -28,7 +28,6 @@ class MyNotesTableViewController: UITableViewController {
         reloadData()
         
         title = "Current Notes: " + String(notes.count)
-        //This line is wrong somehow because the current notes never actually updates, apparently. So there's probably another way to do it, I just missed it. 
         
         
 
@@ -71,6 +70,7 @@ class MyNotesTableViewController: UITableViewController {
                 //saving the nsmanaged object context or throwing an error if we cant
                 do{
                     try self.managedObjectContext.save()
+                    self.viewDidLoad()
                 } catch {
                     print("Error saving the managed object context!")
                 }
@@ -152,6 +152,7 @@ class MyNotesTableViewController: UITableViewController {
             //saving the managed object context, like ya do
             do{
                 try self.managedObjectContext.save()
+                self.viewDidLoad()
             } catch {
                 print("Error saving managed object context!")
             }
