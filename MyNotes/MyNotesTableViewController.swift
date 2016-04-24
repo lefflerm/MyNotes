@@ -22,7 +22,8 @@ class MyNotesTableViewController: UITableViewController {
         super.viewDidLoad()
         
         //actually creating the add button! :D
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "addNote:")
+        //Changed our single add button to an arry of buttons for add, sort and filter
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "addNote:"), UIBarButtonItem(title: "Filter", style: .Plain, target: self, action: "selectFilter:"), UIBarButtonItem(title: "Sort", style: .Plain, target: self, action: "selectSort:")]
         
         //time to call the helper :D gotta make sure the data is FRESH
         reloadData()
@@ -34,9 +35,21 @@ class MyNotesTableViewController: UITableViewController {
     }
     
     //Helper method! For reloading data for viewing
-    func reloadData() {
+    //New optional parameters :D
+    func reloadData(titleFilter: String? = nil, sortDescriptor: String? = nil) {
         //fetch request for data from note entity
         let fetchRequest = NSFetchRequest(entityName: "Note")
+        
+        //we have a fetch request so here's using it for store stuff 
+        if let titleFilter = titleFilter {
+            let titlePredicate = NSPredicate(format: "title [c]%@", titleFilter)
+            fetchRequest.predicate = titlePredicate
+        } //this is using our fetch request to set up a predicate so we can sort by name which is called title in myNotes
+        
+        if let sortDescriptor = sortDescriptor {
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: sortDescriptor, ascending: true)]
+            //super easy, just using our fetch request and sort descriptors to allow for sorting.
+        }
         
         //time to execute that fetch request. do catch for catching error it could throw
         do {
@@ -98,6 +111,51 @@ class MyNotesTableViewController: UITableViewController {
         alert.addAction(cancelAction)
         
         //present view controller
+        presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    //setting up our new methods right after the add method because I feel like it
+    func selectSort(sender: AnyObject?) {
+        //select sort function :D
+        let sheet = UIAlertController(title: "Sort", message: "Notes", preferredStyle: .ActionSheet) //makin an action sheet oh yeah
+        
+        sheet.addAction(UIAlertAction(title:"Cancel", style: .Cancel, handler: { (action) -> Void in})) //letting the sort be canceled
+        sheet.addAction(UIAlertAction(title: "By Title", style: .Default, handler: {(UIAlertAction) -> Void in
+            self.reloadData(nil, sortDescriptor: "title") }))
+        sheet.addAction(UIAlertAction(title: "By Date", style: .Default, handler: {(UIAlertAction) -> Void in
+            self.reloadData(nil, sortDescriptor: "date") }))
+        sheet.addAction(UIAlertAction(title: "By Text", style: .Default, handler: {(UIAlertAction) -> Void in
+            self.reloadData(nil, sortDescriptor: "text") }))
+        //setting up to allow us to sort by title, date or text
+        
+        presentViewController(sheet, animated: true, completion: nil)
+    }
+    
+    func selectFilter(sender: AnyObject?) {
+        //our filtering method!!!
+        
+        let alert = UIAlertController(title: "Filter", message: "Notes", preferredStyle: .Alert) //the alert that will pop up to choose the filter
+        
+        let filterAction = UIAlertAction(title: "Filter", style: .Default) {
+            (action) -> Void in
+            if let titleTextField = alert.textFields?[0], title = titleTextField.text {
+                self.reloadData(title)
+            }
+        } //doing the filtering
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Default) {
+            (action) -> Void in
+            self.reloadData()
+        } //letting us cancel the filtering :D
+        
+        alert.addTextFieldWithConfigurationHandler { (textField) in
+            textField.placeholder = "Title"
+        }
+        
+        alert.addAction(filterAction)
+        alert.addAction(cancelAction)
+        //adding the actions we created
+        
         presentViewController(alert, animated: true, completion: nil)
     }
 
