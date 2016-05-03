@@ -42,7 +42,7 @@ class MyNotesTableViewController: UITableViewController {
         
         //we have a fetch request so here's using it for store stuff 
         if let titleFilter = titleFilter {
-            let titlePredicate = NSPredicate(format: "title [c]%@", titleFilter)
+            let titlePredicate = NSPredicate(format: "title = [c]%@", titleFilter)
             fetchRequest.predicate = titlePredicate
         } //this is using our fetch request to set up a predicate so we can sort by name which is called title in myNotes
         
